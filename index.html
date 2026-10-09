@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🔐 MYSTERY DOOR: Petualangan Asmaul Husna</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    :root {
+      --primary-navy: #0B132B;
+      --deep-purple: #1C153B;
+      --royal-gold: #F6C85F;
+      --gold-dark: #C99723;
+      --emerald-teal: #10B981;
+      --emerald-dark: #059669;
+      --ruby-rose: #F43F5E;
+    }
+    
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #060913;
+      font-family: 'Nunito', sans-serif;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #FFFFFF;
+    }
+
+    h1, h2, h3, h4, .font-title {
+      font-family: 'Fredoka', cursive;
+    }
+
+    /* 16:9 Aspect Ratio Container for Smartboards & Screens */
+    #game-container {
+      width: 100vw;
+      height: 56.25vw; /* 16:9 */
+      max-width: 177.78vh; /* 16:9 */
+      max-height: 100vh;
+      position: relative;
+      background: radial-gradient(circle at 50% 20%, #1e264f 0%, #0c1228 65%, #050711 100%);
+      box-shadow: 0 0 50px rgba(0,0,0,0.8);
+      overflow: hidden;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 3D Button Styles */
+    .btn-3d-gold {
+      background: linear-gradient(180deg, #FDE047 0%, #F59E0B 70%, #D97706 100%);
+      color: #451a03;
+      border: none;
+      box-shadow: 0 8px 0 #92400e, 0 12px 25px rgba(245, 158, 11, 0.4);
+      transition: all 0.15s ease-in-out;
+      cursor: pointer;
+    }
+    .btn-3d-gold:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 0 #92400e, 0 16px 28px rgba(245, 158, 11, 0.5);
+    }
+    .btn-3d-gold:active {
+      transform: translateY(6px);
+      box-shadow: 0 2px 0 #92400e, 0 6px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-3d-blue {
+      background: linear-gradient(180deg, #38BDF8 0%, #0284C7 70%, #0369A1 100%);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 7px 0 #075985, 0 10px 20px rgba(2, 132, 199, 0.35);
+      transition: all 0.15s ease-in-out;
+      cursor: pointer;
+    }
+    .btn-3d-blue:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 9px 0 #075985, 0 14px 24px rgba(2, 132, 199, 0.45);
+    }
+    .btn-3d-blue:active {
+      transform: translateY(5px);
+      box-shadow: 0 2px 0 #075985;
+    }
+
+    .btn-3d-emerald {
+      background: linear-gradient(180deg, #34D399 0%, #10B981 70%, #059669 100%);
+      color: #064e3b;
+      box-shadow: 0 7px 0 #047857, 0 10px 20px rgba(16, 185, 129, 0.35);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-3d-emerald:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 9px 0 #047857;
+    }
+    .btn-3d-emerald:active {
+      transform: translateY(5px);
+      box-shadow: 0 2px 0 #047857;
+    }
+
+    /* Screen Transition */
+    .screen {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.97);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 2.5rem;
+      overflow-y: auto;
+    }
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+
+    /* Card Flip Effects */
+    .memory-card {
+      perspective: 1000px;
+      cursor: pointer;
+    }
+    .memory-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.5s;
+      transform-style: preserve-3d;
+    }
+    .memory-card.flipped .memory-card-inner {
+      transform: rotateY(180deg);
+    }
+    .memory-card-front, .memory-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem;
+    }
+    .memory-card-back {
+      transform: rotateY(180deg);
+    }
+
+    /* Floating stars and glow animation */
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 10px rgba(246, 200, 95, 0.4)); }
+      50% { filter: drop-shadow(0 0 24px rgba(246, 200, 95, 0.9)); }
+    }
+    .glow-gold {
+      animation: pulseGlow 2.5s infinite;
+    }
+
+    @keyframes floatSoft {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .floating {
+      animation: floatSoft 3s ease-in-out infinite;
+    }
+
+    /* Confetti Canvas */
+    #confetti-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    /* Custom Scrollbar for inner screen if needed */
+    .screen::-webkit-scrollbar {
+      width: 6px;
+    }
+    .screen::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-container">
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- TOP HUD (Displayed on play screens) -->
+    <header id="top-hud" class="w-full flex justify-between items-center z-40 px-6 py-2 border-b border-white/10 bg-black/40 backdrop-blur-md">
+      <!-- Title & Map Link -->
+      <div class="flex items-center gap-3">
+        <button onclick="goToScreen('screen-map')" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 transition flex items-center gap-2 text-xs font-bold text-amber-300 border border-amber-400/30">
+          <i class="fa-solid fa-map"></i> <span>PETA ISTANA</span>
+        </button>
+        <div class="hidden sm:flex items-center gap-2 text-white/80 text-xs">
+          <i class="fa-solid fa-moon text-yellow-300"></i>
+          <span>Mystery Castle</span>
+        </div>
+      </div>
+
+      <!-- Keys Inventory (4 Keys Required) -->
+      <div class="flex items-center gap-2 bg-slate-900/80 px-4 py-1.5 rounded-full border border-amber-500/40 shadow-inner">
+        <span class="text-xs font-bold text-amber-300 mr-1">KUNCI:</span>
+        <div id="hud-key-1" class="text-base text-gray-500 transition-all duration-300"><i class="fa-solid fa-key"></i></div>
+        <div id="hud-key-2" class="text-base text-gray-500 transition-all duration-300"><i class="fa-solid fa-key"></i></div>
+        <div id="hud-key-3" class="text-base text-gray-500 transition-all duration-300"><i class="fa-solid fa-key"></i></div>
+        <div id="hud-key-4" class="text-base text-gray-500 transition-all duration-300"><i class="fa-solid fa-key"></i></div>
+      </div>
+
+      <!-- Score & Audio Controls -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 bg-amber-500/20 px-3 py-1 rounded-xl border border-amber-400/50">
+          <i class="fa-solid fa-star text-yellow-400 text-sm animate-spin-slow"></i>
+          <span id="hud-score" class="font-extrabold text-yellow-300 text-sm">0</span>
+        </div>
+        <button id="btn-sound" onclick="toggleAudio()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/90 text-sm transition" title="Sound On/Off">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+      </div>
+    </header>
+
+    <section id="screen-cover" class="screen active justify-between text-center relative overflow-hidden bg-gradient-to-b from-[#0e1738] via-[#141b3d] to-[#070b18]">
+      <!-- Background Islamic Geometric Silhouette Decor -->
+      <div class="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
+        <svg width="600" height="600" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+          <polygon points="50,5 95,50 50,95 5,50" stroke-width="1.5"/>
+          <polygon points="50,15 85,50 50,85 15,50" stroke-width="1.5"/>
+          <circle cx="50" cy="50" r="30" stroke-width="1"/>
+          <circle cx="50" cy="50" r="42" stroke-width="1"/>
+        </svg>
+      </div>
+
+      <!-- Header Label -->
+      <div class="flex justify-between items-center z-10 pt-2">
+        <div class="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/40 px-4 py-1.5 rounded-full text-xs font-extrabold text-amber-300 tracking-wider">
+          <i class="fa-solid fa-mosque"></i>
+          <span>DIGITAL EDUCATIONAL GAME PAI SD</span>
+        </div>
+        <div class="text-xs text-sky-300 font-bold bg-sky-950/60 border border-sky-400/30 px-3 py-1 rounded-full">
+          KELAS 3 - 6 SD
+        </div>
+      </div>
+
+      <!-- Main Title & Visual -->
+      <div class="my-auto z-10 flex flex-col items-center">
+        <!-- Floating Moon & Keys Icon -->
+        <div class="floating mb-2 relative">
+          <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-200 flex items-center justify-center shadow-2xl glow-gold mx-auto">
+            <span class="text-4xl">🔐</span>
+          </div>
+          <span class="absolute -top-1 -right-2 text-2xl animate-pulse">✨</span>
+          <span class="absolute -bottom-1 -left-2 text-xl">🌙</span>
+        </div>
+
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-400 drop-shadow-md">
+          MYSTERY DOOR
+        </h1>
+        <h2 class="text-xl md:text-2xl font-bold text-sky-200 mt-1 mb-2">
+          Petualangan Mengenal Asmaul Husna
+        </h2>
+        <p class="text-sm md:text-base text-slate-300 max-w-xl mx-auto font-medium">
+          "Berani membuka semua pintu misterius di Mystery Castle dan mengumpulkan kunci emas nama-nama Allah?"
+        </p>
+
+        <!-- Big Start Action Button -->
+        <div class="mt-6 flex flex-col sm:flex-row items-center gap-4">
+          <button onclick="startGame()" class="btn-3d-gold px-10 py-4 rounded-2xl text-xl font-bold font-title flex items-center gap-3">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>MULAI PETUALANGAN</span>
+          </button>
+          <button onclick="goToScreen('screen-guide')" class="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm transition">
+            <i class="fa-solid fa-circle-question mr-2"></i>CARA BERMAIN
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <div class="z-10 flex justify-between items-center text-xs text-slate-400 border-t border-white/10 pt-3">
+        <span>🕌 10 Asmaul Husna • 4 Pintu Misteri • 1 Golden Gate</span>
+        <span class="text-amber-400">Tekan tombol untuk menjelajah! ➔</span>
+      </div>
+    </section>
+
+    <section id="screen-intro" class="screen justify-between bg-gradient-to-br from-[#0c142c] to-[#1a113a]">
+      <div class="flex justify-between items-center">
+        <span class="text-xs bg-indigo-500/30 text-indigo-300 font-extrabold px-3 py-1 rounded-lg border border-indigo-400/30">
+          PROLOG CERITA
+        </span>
+        <h2 class="text-xl font-title text-amber-300">🌙 Misi Dimulai!</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto">
+        <!-- Visual Explorer Graphic / Avatar -->
+        <div class="md:col-span-5 flex justify-center">
+          <div class="w-56 h-56 rounded-3xl bg-gradient-to-b from-sky-400 to-indigo-700 p-2 shadow-2xl relative border-4 border-amber-400/60 flex items-center justify-center">
+            <div class="text-center">
+              <div class="text-6xl mb-2 floating">🧭</div>
+              <span class="font-title text-lg font-bold text-amber-200">Asmaul Husna Explorer</span>
+              <p class="text-xs text-sky-100 mt-1">Membawa Peta & Kunci Emas</p>
+            </div>
+            <div class="absolute -top-3 -right-3 bg-amber-400 text-amber-950 px-2 py-0.5 rounded-full text-xs font-black">
+              SIAP!
+            </div>
+          </div>
+        </div>
+
+        <!-- Story Dialog Box -->
+        <div class="md:col-span-7 bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/15 shadow-xl text-left">
+          <p class="text-xl font-bold text-white mb-2 leading-relaxed font-title">
+            "Selamat datang, Asmaul Husna Explorer!"
+          </p>
+          <p class="text-slate-200 text-sm md:text-base leading-relaxed mb-4">
+            Di hadapanmu berdiri sebuah istana megah bernama <strong>Mystery Castle</strong>. Ada 5 pintu yang terkunci rapat dengan gembok misteri. 
+          </p>
+          <div class="p-3.5 bg-emerald-500/20 border-l-4 border-emerald-400 rounded-r-xl mb-4 text-xs md:text-sm text-emerald-200">
+            ✨ <strong>Misi Utama:</strong> Buka setiap pintu dengan membuktikan pemahamanmu tentang nama-nama Allah SWT yang mulia, kumpulkan 4 kunci emas, lalu masuki Golden Gate!
+          </div>
+          <button onclick="goToScreen('screen-guide')" class="btn-3d-blue px-6 py-2.5 rounded-xl font-bold font-title text-sm flex items-center gap-2">
+            <span>PELAJARI CARA BERMAIN</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center text-xs text-slate-400">
+        <span>Tahap 1 / 5</span>
+        <button onclick="goToScreen('screen-map')" class="text-amber-400 hover:underline">Lewati ke Peta ➜</button>
+      </div>
+    </section>
+
+    <section id="screen-guide" class="screen justify-between bg-gradient-to-b from-[#0c1633] to-[#121c44]">
+      <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-title text-amber-300">🎮 Cara Bermain</h2>
+        <span class="text-xs text-sky-300 bg-sky-900/50 px-3 py-1 rounded-full border border-sky-400/30">Panduan Petualang</span>
+      </div>
+
+      <!-- 4 Step Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 my-auto">
+        <div class="bg-white/10 border border-white/15 p-4 rounded-2xl text-center flex flex-col items-center">
+          <div class="w-12 h-12 rounded-full bg-sky-500/20 text-sky-300 text-2xl flex items-center justify-center mb-2">👀</div>
+          <h3 class="font-title text-base font-bold text-sky-300 mb-1">1. BACA</h3>
+          <p class="text-xs text-slate-200">Pahami petunjuk & cerita di balik tiap pintu misterius.</p>
+        </div>
+        <div class="bg-white/10 border border-white/15 p-4 rounded-2xl text-center flex flex-col items-center">
+          <div class="w-12 h-12 rounded-full bg-purple-500/20 text-purple-300 text-2xl flex items-center justify-center mb-2">🧠</div>
+          <h3 class="font-title text-base font-bold text-purple-300 mb-1">2. PIKIRKAN</h3>
+          <p class="text-xs text-slate-200">Cari hubungan makna Asmaul Husna yang paling tepat.</p>
+        </div>
+        <div class="bg-white/10 border border-white/15 p-4 rounded-2xl text-center flex flex-col items-center">
+          <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-300 text-2xl flex items-center justify-center mb-2">🔑</div>
+          <h3 class="font-title text-base font-bold text-amber-300 mb-1">3. SELESAIKAN</h3>
+          <p class="text-xs text-slate-200">Buka gembok misi untuk meraih Kunci Emas bersinar.</p>
+        </div>
+        <div class="bg-white/10 border border-white/15 p-4 rounded-2xl text-center flex flex-col items-center">
+          <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-300 text-2xl flex items-center justify-center mb-2">👑</div>
+          <h3 class="font-title text-base font-bold text-emerald-300 mb-1">4. MENANG</h3>
+          <p class="text-xs text-slate-200">Kumpulkan semua kunci & taklukkan Golden Gate!</p>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center bg-white/5 p-3 rounded-2xl border border-white/10">
+        <div class="text-xs text-amber-300 font-semibold">
+          ⭐ Setiap misi yang selesai akan menambah +100 Poin Bintang!
+        </div>
+        <button onclick="goToScreen('screen-map')" class="btn-3d-gold px-6 py-2.5 rounded-xl text-sm font-bold font-title">
+          BUKA PETA DUNIA 🗺️
+        </button>
+      </div>
+    </section>
+
+    <section id="screen-map" class="screen justify-between bg-gradient-to-b from-[#0a1128] via-[#10193d] to-[#070b1a]">
+      <div class="flex justify-between items-center">
+        <div>
+          <span class="text-xs text-emerald-400 font-bold">PETA DUNIA PETUALANGAN</span>
+          <h2 class="text-2xl font-title text-amber-300">🗺️ MYSTERY CASTLE MAP</h2>
+        </div>
+        <div class="text-xs bg-amber-500/20 border border-amber-400/40 px-3 py-1 rounded-full text-amber-300 font-bold">
+          PILIH PINTU AKTIF
+        </div>
+      </div>
+
+      <!-- Map 5 Doors Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3 my-auto">
+        <!-- Door 1 Node -->
+        <div id="node-door-1" onclick="selectMapDoor(1)" class="group bg-white/10 hover:bg-white/20 border-2 border-amber-400 rounded-2xl p-3 text-center cursor-pointer transition transform hover:-translate-y-1 shadow-lg">
+          <div class="w-12 h-12 mx-auto rounded-full bg-amber-500/30 text-amber-300 text-2xl flex items-center justify-center mb-2 group-hover:scale-110 transition">
+            🚪
+          </div>
+          <span class="bg-amber-500 text-amber-950 text-[10px] font-black px-2 py-0.5 rounded-md">DOOR 1</span>
+          <h4 class="font-title text-sm font-bold text-white mt-1">Golden Clue</h4>
+          <p class="text-[11px] text-slate-300 mt-0.5">Tebak Nama</p>
+          <div id="status-door-1" class="mt-2 text-[11px] font-extrabold text-emerald-400">TERBUKA 🔓</div>
+        </div>
+
+        <!-- Door 2 Node -->
+        <div id="node-door-2" onclick="selectMapDoor(2)" class="group bg-white/5 border border-white/15 rounded-2xl p-3 text-center cursor-pointer transition transform hover:-translate-y-1">
+          <div class="w-12 h-12 mx-auto rounded-full bg-purple-500/20 text-purple-300 text-2xl flex items-center justify-center mb-2 group-hover:scale-110 transition">
+            🔗
+          </div>
+          <span class="bg-purple-500/80 text-white text-[10px] font-black px-2 py-0.5 rounded-md">DOOR 2</span>
+          <h4 class="font-title text-sm font-bold text-white mt-1">Magic Match</h4>
+          <p class="text-[11px] text-slate-300 mt-0.5">Pasangkan Arti</p>
+          <div id="status-door-2" class="mt-2 text-[11px] font-extrabold text-gray-400">TERKUNCI 🔒</div>
+        </div>
+
+        <!-- Door 3 Node -->
+        <div id="node-door-3" onclick="selectMapDoor(3)" class="group bg-white/5 border border-white/15 rounded-2xl p-3 text-center cursor-pointer transition transform hover:-translate-y-1">
+          <div class="w-12 h-12 mx-auto rounded-full bg-orange-500/20 text-orange-300 text-2xl flex items-center justify-center mb-2 group-hover:scale-110 transition">
+            🔍
+          </div>
+          <span class="bg-orange-500/80 text-white text-[10px] font-black px-2 py-0.5 rounded-md">DOOR 3</span>
+          <h4 class="font-title text-sm font-bold text-white mt-1">Who Am I?</h4>
+          <p class="text-[11px] text-slate-300 mt-0.5">Misteri Detektif</p>
+          <div id="status-door-3" class="mt-2 text-[11px] font-extrabold text-gray-400">TERKUNCI 🔒</div>
+        </div>
+
+        <!-- Door 4 Node -->
+        <div id="node-door-4" onclick="selectMapDoor(4)" class="group bg-white/5 border border-white/15 rounded-2xl p-3 text-center cursor-pointer transition transform hover:-translate-y-1">
+          <div class="w-12 h-12 mx-auto rounded-full bg-teal-500/20 text-teal-300 text-2xl flex items-center justify-center mb-2 group-hover:scale-110 transition">
+            🤝
+          </div>
+          <span class="bg-teal-500/80 text-white text-[10px] font-black px-2 py-0.5 rounded-md">DOOR 4</span>
+          <h4 class="font-title text-sm font-bold text-white mt-1">Good Deed</h4>
+          <p class="text-[11px] text-slate-300 mt-0.5">Tindakan Baik</p>
+          <div id="status-door-4" class="mt-2 text-[11px] font-extrabold text-gray-400">TERKUNCI 🔒</div>
+        </div>
+
+        <!-- Final Gate Node -->
+        <div id="node-door-5" onclick="selectMapDoor(5)" class="col-span-2 md:col-span-1 group bg-gradient-to-b from-amber-500/20 to-yellow-600/30 border-2 border-dashed border-amber-400 rounded-2xl p-3 text-center cursor-pointer transition transform hover:-translate-y-1">
+          <div class="w-12 h-12 mx-auto rounded-full bg-amber-400 text-amber-950 text-2xl flex items-center justify-center mb-2 group-hover:scale-110 transition">
+            👑
+          </div>
+          <span class="bg-yellow-400 text-yellow-950 text-[10px] font-black px-2 py-0.5 rounded-md">FINAL</span>
+          <h4 class="font-title text-sm font-bold text-amber-200 mt-1">Golden Gate</h4>
+          <p class="text-[11px] text-slate-300 mt-0.5">Kuis Pamungkas</p>
+          <div id="status-door-5" class="mt-2 text-[11px] font-extrabold text-amber-300">4 KUNCI 🔑</div>
+        </div>
+      </div>
+
+      <!-- Quick Action / Mini Challenges -->
+      <div class="flex flex-wrap gap-2 justify-between items-center bg-white/5 p-3 rounded-2xl border border-white/10">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-300">Zona Latihan Cepat:</span>
+          <button onclick="goToScreen('screen-bonus')" class="text-xs bg-rose-500/30 hover:bg-rose-500/50 text-rose-300 border border-rose-400/40 px-3 py-1 rounded-lg font-bold">
+            ⚡ 30s Flash Challenge
+          </button>
+          <button onclick="goToScreen('screen-memory')" class="text-xs bg-purple-500/30 hover:bg-purple-500/50 text-purple-300 border border-purple-400/40 px-3 py-1 rounded-lg font-bold">
+            🧠 Memory Cards
+          </button>
+        </div>
+        <div class="text-xs text-amber-300">
+          Klik salah satu pintu yang sudah terbuka untuk mulai misi!
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-door1-intro" class="screen justify-between bg-gradient-to-b from-[#131b38] to-[#1e173a]">
+      <div class="flex justify-between items-center">
+        <span class="text-xs bg-amber-500 text-amber-950 font-black px-3 py-1 rounded-lg">MISI 1</span>
+        <h2 class="text-2xl font-title text-amber-300">🚪 DOOR 1 — THE GOLDEN CLUE</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto">
+        <div class="md:col-span-5 text-center">
+          <div class="w-48 h-48 mx-auto rounded-3xl bg-amber-500/20 border-4 border-amber-400 flex flex-col items-center justify-center p-4 glow-gold">
+            <span class="text-6xl mb-2">🔒</span>
+            <span class="font-title text-amber-300 font-bold text-lg">Gembok Emas Pertama</span>
+            <p class="text-[11px] text-slate-300">Terselubung rahasia sifat Maha Pengasih</p>
+          </div>
+        </div>
+        <div class="md:col-span-7 bg-white/10 p-6 rounded-3xl border border-white/15">
+          <span class="text-xs text-amber-400 font-extrabold bg-amber-900/40 px-2.5 py-1 rounded-md">PETUNJUK MISI</span>
+          <h3 class="font-title text-xl md:text-2xl font-bold text-white mt-2 mb-3">
+            "Temukan nama Asmaul Husna yang tepat berdasarkan petunjuk rahasia!"
+          </h3>
+          <p class="text-slate-300 text-sm mb-4 leading-relaxed">
+            Jika kamu memilih nama yang benar, gembok emas akan terbuka dan Kunci 1 akan menjadi milikmu!
+          </p>
+          <button onclick="goToScreen('screen-door1-quiz')" class="btn-3d-gold px-8 py-3 rounded-2xl font-bold font-title text-base flex items-center gap-2">
+            <i class="fa-solid fa-key"></i>
+            <span>BUKA MISI SEKARANG</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-between text-xs text-slate-400">
+        <span>Tingkat: Dasar ★☆☆</span>
+        <span class="text-amber-400">Hadiah: Kunci 1 + 100 Poin ⭐</span>
+      </div>
+    </section>
+
+    <section id="screen-door1-quiz" class="screen justify-between bg-gradient-to-b from-[#0c142c] to-[#15234d]">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="text-xs bg-sky-500 text-white font-extrabold px-2.5 py-1 rounded-md">DOOR 1</span>
+          <h2 class="text-xl font-title text-white">Teka-Teki Pintu Emas</h2>
+        </div>
+        <div class="text-xs bg-rose-500/20 border border-rose-400/40 text-rose-300 px-3 py-1 rounded-full font-bold">
+          ❤️ Petunjuk: Cahaya Kasih Sayang
+        </div>
+      </div>
+
+      <!-- Question Prompt -->
+      <div class="bg-white/10 border-2 border-amber-400/50 p-6 rounded-3xl text-center shadow-xl my-2">
+        <span class="text-3xl mb-1 block">❤️✨</span>
+        <h3 class="font-title text-2xl md:text-3xl font-bold text-amber-200">
+          "Aku adalah Allah Yang Maha Pengasih.<br>Siapakah Aku?"
+        </h3>
+      </div>
+
+      <!-- 3 Options -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
+        <button onclick="answerDoor1('A', this)" class="option-btn bg-white/10 hover:bg-white/20 border-2 border-white/20 p-4 rounded-2xl text-center transition flex flex-col items-center">
+          <span class="w-8 h-8 rounded-full bg-white/10 text-slate-300 font-bold flex items-center justify-center text-sm mb-2">A</span>
+          <span class="font-title text-xl font-bold text-white">Al-'Alim</span>
+          <span class="text-xs text-slate-300 mt-1">Maha Mengetahui</span>
+        </button>
+
+        <button onclick="answerDoor1('B', this)" class="option-btn bg-white/10 hover:bg-white/20 border-2 border-white/20 p-4 rounded-2xl text-center transition flex flex-col items-center">
+          <span class="w-8 h-8 rounded-full bg-white/10 text-slate-300 font-bold flex items-center justify-center text-sm mb-2">B</span>
+          <span class="font-title text-xl font-bold text-white">Ar-Rahman</span>
+          <span class="text-xs text-slate-300 mt-1">Maha Pengasih</span>
+        </button>
+
+        <button onclick="answerDoor1('C', this)" class="option-btn bg-white/10 hover:bg-white/20 border-2 border-white/20 p-4 rounded-2xl text-center transition flex flex-col items-center">
+          <span class="w-8 h-8 rounded-full bg-white/10 text-slate-300 font-bold flex items-center justify-center text-sm mb-2">C</span>
+          <span class="font-title text-xl font-bold text-white">Al-Ghafur</span>
+          <span class="text-xs text-slate-300 mt-1">Maha Pengampun</span>
+        </button>
+      </div>
+
+      <div id="door1-feedback" class="text-center min-h-[30px] text-sm font-bold text-amber-300">
+        Sentuh atau klik kartu nama Asmaul Husna yang paling tepat!
+      </div>
+    </section>
+
+    <section id="screen-door1-success" class="screen justify-between bg-gradient-to-b from-[#06241b] to-[#0c1a2e]">
+      <div class="flex justify-between items-center">
+        <span class="text-xs bg-emerald-500 text-emerald-950 font-black px-3 py-1 rounded-full">
+          🎉 JAWABAN BENAR!
+        </span>
+        <span class="text-xs bg-amber-400 text-amber-950 font-black px-3 py-1 rounded-full">
+          ⭐ +100 POIN
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto">
+        <div class="md:col-span-5 text-center">
+          <div class="w-48 h-48 mx-auto rounded-3xl bg-emerald-500/20 border-4 border-emerald-400 flex flex-col items-center justify-center p-4 glow-gold">
+            <span class="text-6xl mb-2">🔓🔑</span>
+            <span class="font-title text-amber-300 font-bold text-lg">KEY 1 DIDAPATKAN!</span>
+            <p class="text-xs text-emerald-300 mt-1">Pintu Pertama Terbuka Lebar</p>
+          </div>
+        </div>
+        <div class="md:col-span-7 bg-white/10 p-6 rounded-3xl border border-white/15">
+          <h2 class="font-title text-3xl font-bold text-emerald-300 mb-2">
+            Hebat Sekali, Explorer! 🌟
+          </h2>
+          <div class="bg-black/30 p-4 rounded-2xl border border-emerald-500/30 mb-4">
+            <p class="text-lg font-bold text-amber-300 font-title mb-1">
+              Ar-Rahman = Allah Yang Maha Pengasih
+            </p>
+            <p class="text-sm text-slate-200 leading-relaxed">
+              Kasih sayang Allah SWT melimpah luas untuk seluruh makhluk hidup ciptaan-Nya di alam semesta tanpa terkecuali.
+            </p>
+          </div>
+          <button onclick="goToDoor2()" class="btn-3d-emerald px-8 py-3 rounded-2xl font-bold font-title text-base flex items-center gap-2">
+            <span>LANJUT KE DOOR 2</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-between text-xs text-slate-400">
+        <span>Progress: 1 / 4 Kunci Emas</span>
+        <span class="text-amber-300 font-bold">Door 2 telah terbuka!</span>
+      </div>
+    </section>
+
+    <section id="screen-door2" class="screen justify-between bg-gradient-to-b from-[#180f33] to-[#0d102b]">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="text-xs bg-purple-500 text-white font-extrabold px-3 py-1 rounded-md">MISI 2</span>
+          <h2 class="text-xl font-title text-amber-300">🚪 DOOR 2 — MAGIC MATCH</h2>
+        </div>
+        <div class="text-xs bg-purple-900/60 border border-purple-400/40 text-purple-300 px-3 py-1 rounded-full font-bold">
+          <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Cocokkan Pasangan
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-300 text-center">
+        Pilih 1 nama di sebelah kiri, lalu pilih artinya di sebelah kanan untuk menyambungkan energi ajaib!
+      </p>
+
+      <!-- Matching Board -->
+      <div class="grid grid-cols-2 gap-6 my-auto">
+        <!-- Names Column (Left) -->
+        <div class="flex flex-col gap-2.5">
+          <div onclick="selectMatchName(0, this)" data-index="0" class="match-name-btn bg-white/10 hover:bg-white/20 border-2 border-purple-400/40 p-3 rounded-xl flex items-center justify-between cursor-pointer transition">
+            <span class="font-title font-bold text-white text-base">Ar-Rahim</span>
+            <span class="match-dot w-3 h-3 rounded-full bg-purple-400"></span>
+          </div>
+          <div onclick="selectMatchName(1, this)" data-index="1" class="match-name-btn bg-white/10 hover:bg-white/20 border-2 border-purple-400/40 p-3 rounded-xl flex items-center justify-between cursor-pointer transition">
+            <span class="font-title font-bold text-white text-base">Al-'Alim</span>
+            <span class="match-dot w-3 h-3 rounded-full bg-purple-400"></span>
+          </div>
+          <div onclick="selectMatchName(2, this)" data-index="2" class="match-name-btn bg-white/10 hover:bg-white/20 border-2 border-purple-400/40 p-3 rounded-xl flex items-center justify-between cursor-pointer transition">
+            <span class="font-title font-bold text-white text-base">As-Sami'</span>
+            <span class="match-dot w-3 h-3 rounded-full bg-purple-400"></span>
+          </div>
+          <div onclick="selectMatchName(3, this)" data-index="3" class="match-name-btn bg-white/10 hover:bg-white/20 border-2 border-purple-400/40 p-3 rounded-xl flex items-center justify-between cursor-pointer transition">
+            <span class="font-title font-bold text-white text-base">Al-Bashir</span>
+            <span class="match-dot w-3 h-3 rounded-full bg-purple-400"></span>
+          </div>
+        </div>
+
+        <!-- Meanings Column (Right - Shuffled) -->
+        <div class="flex flex-col gap-2.5">
+          <div onclick="selectMatchMeaning(3, this)" data-pair="3" class="match-meaning-btn bg-white/10 hover:bg-white/20 border-2 border-sky-400/40 p-3 rounded-xl flex items-center justify-between cursor-pointer transition">
+            <span class="match-dot w-3 h-3 rounded-full bg-sky-400"></span>
+            <span class="font-bold text-white text-sm">Maha Melihat</span>
+          </div>
+          <div onclick="selectMatchMeaning(0, this)" data-pair="0" class="match-meaning-btn bg-white/10 hover:bg-white/20 border-2 border-sky-400/40 p-3 rounded-xl flex items-center justify-between cursor-pointer transition">
+            <span class="match-dot w-3 h-3 rounded-full bg-sky-400"></span>
+            <span class="font-bold text-white text-sm">Maha Penyayang</span>
+          </div>
+          <div onclick="selectMatchMeaning(1, this)" data-pair="1" class="match-meaning-btn bg-white/10 hover:bg-white/20 border-2 border-sky-400/40 p-3 rounded-xl flex items-center justify-between cursor-pointer transition">
+            <span class="match-dot w-3 h-3 rounded-full bg-sky-400"></span>
+            <span class="font-bold text-white text-sm">Maha Mengetahui</span>
+          </div>
+          <div onclick="selectMatchMeaning(2, this)" data-pair="2" class="match-meaning-btn bg-white/10 hover:bg-white/20 border-2 border-sky-400/40 p-3 rounded-xl flex items-center justify-between cursor-pointer transition">
+            <span class="match-dot w-3 h-3 rounded-full bg-sky-400"></span>
+            <span class="font-bold text-white text-sm">Maha Mendengar</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center text-xs text-slate-300">
+        <span id="match-status-text">Tersisa 4 pasangan untuk dihubungkan.</span>
+        <span class="text-amber-400">Hadiah: Kunci 2 🔑</span>
+      </div>
+    </section>
+
+    <section id="screen-door2-success" class="screen justify-between bg-gradient-to-b from-[#1c1236] to-[#0c142b]">
+      <div class="flex justify-between items-center">
+        <span class="text-xs bg-purple-500 text-white font-extrabold px-3 py-1 rounded-full">
+          ✨ MATCH COMPLETE!
+        </span>
+        <span class="text-xs bg-amber-400 text-amber-950 font-black px-3 py-1 rounded-full">
+          ⭐⭐⭐⭐ SEMUA PASANGAN BENAR!
+        </span>
+      </div>
+
+      <div class="my-auto text-center">
+        <div class="w-24 h-24 mx-auto rounded-full bg-purple-500/20 border-4 border-purple-400 flex items-center justify-center text-4xl mb-3 glow-gold">
+          🔑
+        </div>
+        <h2 class="font-title text-3xl font-bold text-amber-300 mb-2">
+          KEY 2 UNLOCKED! (+100 Poin)
+        </h2>
+        <p class="text-slate-200 text-sm max-w-lg mx-auto mb-6">
+          Energi magis Asmaul Husna telah menyatu: <strong>Ar-Rahim</strong> (Maha Penyayang), <strong>Al-'Alim</strong> (Maha Mengetahui), <strong>As-Sami'</strong> (Maha Mendengar), dan <strong>Al-Bashir</strong> (Maha Melihat).
+        </p>
+        <button onclick="goToDoor3()" class="btn-3d-gold px-8 py-3 rounded-2xl font-bold font-title text-base inline-flex items-center gap-2">
+          <span>LANJUT KE DOOR 3</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <div class="flex justify-between text-xs text-slate-400">
+        <span>Progress: 2 / 4 Kunci Emas</span>
+        <span class="text-emerald-400">Misi Detektif terbuka!</span>
+      </div>
+    </section>
+
+    <section id="screen-door3" class="screen justify-between bg-gradient-to-b from-[#1a1208] to-[#121c38]">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="text-xs bg-orange-500 text-white font-extrabold px-2.5 py-1 rounded-md">MISI 3</span>
+          <h2 class="text-xl font-title text-amber-300">🚪 DOOR 3 — WHO AM I?</h2>
+        </div>
+        <div class="text-xs bg-orange-950/70 border border-orange-500/40 text-orange-300 px-3 py-1 rounded-full font-bold">
+          🕵️ MISTERI DETEKTIF
+        </div>
+      </div>
+
+      <!-- Clue Card -->
+      <div class="bg-white/10 border-2 border-dashed border-orange-400/60 p-5 rounded-3xl my-2">
+        <div class="flex items-center gap-2 text-orange-400 font-title font-bold text-base mb-1">
+          <span class="text-2xl">🔍</span> PETUNJUK KASUS:
+        </div>
+        <p class="text-white text-lg md:text-xl font-bold leading-relaxed">
+          "Aku mengetahui semua hal yang kamu lakukan, baik ucapan lisan maupun bisikan di dalam hatimu. Tidak ada satu pun rahasia di langit dan bumi yang tersembunyi dari-Ku."
+        </p>
+        <p class="text-orange-300 font-extrabold text-sm mt-2">
+          Pertanyaan: Siapakah Aku?
+        </p>
+      </div>
+
+      <!-- 3 Options -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
+        <button onclick="answerDoor3('A', this)" class="bg-white/10 hover:bg-white/20 border-2 border-white/20 p-4 rounded-2xl text-center transition flex flex-col items-center">
+          <span class="w-8 h-8 rounded-full bg-orange-500/30 text-orange-300 font-bold flex items-center justify-center text-sm mb-1">A</span>
+          <span class="font-title text-xl font-bold text-white">Al-'Alim</span>
+          <span class="text-xs text-slate-300">Maha Mengetahui</span>
+        </button>
+
+        <button onclick="answerDoor3('B', this)" class="bg-white/10 hover:bg-white/20 border-2 border-white/20 p-4 rounded-2xl text-center transition flex flex-col items-center">
+          <span class="w-8 h-8 rounded-full bg-white/10 text-slate-300 font-bold flex items-center justify-center text-sm mb-1">B</span>
+          <span class="font-title text-xl font-bold text-white">Ar-Razzaq</span>
+          <span class="text-xs text-slate-300">Maha Pemberi Rezeki</span>
+        </button>
+
+        <button onclick="answerDoor3('C', this)" class="bg-white/10 hover:bg-white/20 border-2 border-white/20 p-4 rounded-2xl text-center transition flex flex-col items-center">
+          <span class="w-8 h-8 rounded-full bg-white/10 text-slate-300 font-bold flex items-center justify-center text-sm mb-1">C</span>
+          <span class="font-title text-xl font-bold text-white">Al-Karim</span>
+          <span class="text-xs text-slate-300">Maha Pemurah</span>
+        </button>
+      </div>
+
+      <div id="door3-feedback" class="text-center min-h-[24px] text-xs font-bold text-amber-300">
+        Pecahkan kasus detektif ini dengan ketelitianmu!
+      </div>
+    </section>
+
+    <section id="screen-door3-success" class="screen justify-between bg-gradient-to-b from-[#0d2218] to-[#0c182d]">
+      <div class="flex justify-between items-center">
+        <span class="text-xs bg-emerald-500 text-emerald-950 font-black px-3 py-1 rounded-full">
+          🕵️ KASUS TERPECAHKAN!
+        </span>
+        <span class="text-xs bg-amber-400 text-amber-950 font-black px-3 py-1 rounded-full">
+          ⭐ +100 POIN
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto">
+        <div class="md:col-span-5 text-center">
+          <div class="w-48 h-48 mx-auto rounded-3xl bg-emerald-500/20 border-4 border-emerald-400 flex flex-col items-center justify-center p-4 glow-gold">
+            <span class="text-6xl mb-1">🔑✨</span>
+            <span class="font-title text-amber-300 font-bold text-lg">KEY 3 DIDAPATKAN!</span>
+            <p class="text-xs text-emerald-300 mt-1">Al-'Alim: Maha Mengetahui</p>
+          </div>
+        </div>
+        <div class="md:col-span-7 bg-white/10 p-6 rounded-3xl border border-white/15">
+          <h2 class="font-title text-3xl font-bold text-emerald-300 mb-2">
+            Hebat, Detektif Cilik! 🌿
+          </h2>
+          <div class="bg-black/30 p-4 rounded-2xl border border-emerald-500/30 mb-4">
+            <p class="text-base text-slate-200 leading-relaxed">
+              Karena Allah <strong>Al-'Alim</strong> mengetahui setiap gerak-gerik dan isi hati kita, seorang muslim senantiasa bersikap jujur dan tulus di manapun berada.
+            </p>
+          </div>
+          <button onclick="goToDoor4()" class="btn-3d-emerald px-8 py-3 rounded-2xl font-bold font-title text-base flex items-center gap-2">
+            <span>LANJUT KE DOOR 4</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-between text-xs text-slate-400">
+        <span>Progress: 3 / 4 Kunci Emas</span>
+        <span class="text-amber-300 font-bold">1 Kunci lagi menuju Golden Gate!</span>
+      </div>
+    </section>
+
+    <section id="screen-door4" class="screen justify-between bg-gradient-to-b from-[#081f21] to-[#0c1833]">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="text-xs bg-teal-500 text-teal-950 font-black px-2.5 py-1 rounded-md">MISI 4</span>
+          <h2 class="text-xl font-title text-amber-300">🚪 DOOR 4 — GOOD DEED QUEST</h2>
+        </div>
+        <div class="text-xs bg-teal-900/60 border border-teal-400/40 text-teal-300 px-3 py-1 rounded-full font-bold">
+          🤝 Teladan Kehidupan Sehari-hari
+        </div>
+      </div>
+
+      <!-- Situation Scenario -->
+      <div class="bg-white/10 border-2 border-teal-400/50 p-5 rounded-3xl my-2">
+        <span class="text-[11px] bg-teal-500 text-teal-950 font-black px-2 py-0.5 rounded">SITUASI DI SEKOLAH</span>
+        <h3 class="font-title text-xl md:text-2xl font-bold text-white mt-2 leading-relaxed">
+          "Teman sebangkumu lupa membawa pensil saat ujian menulis. Kamu membawa dua pensil di dalam tempat pensilmu. Apa yang sebaiknya kamu lakukan?"
+        </h3>
+        <p class="text-teal-300 text-xs font-bold mt-1">Choose the kindest action!</p>
+      </div>
+
+      <!-- 3 Choices -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
+        <button onclick="answerDoor4('A', this)" class="bg-white/10 hover:bg-white/20 border-2 border-white/20 p-4 rounded-2xl text-center transition flex flex-col items-center">
+          <span class="text-3xl mb-1">😆</span>
+          <span class="font-title text-base font-bold text-white">A. Menertawakannya</span>
+          <span class="text-xs text-slate-300 mt-1">Mengejek teman yang lupa</span>
+        </button>
+
+        <button onclick="answerDoor4('B', this)" class="bg-white/10 hover:bg-white/20 border-2 border-white/20 p-4 rounded-2xl text-center transition flex flex-col items-center">
+          <span class="text-3xl mb-1">🤝</span>
+          <span class="font-title text-base font-bold text-white">B. Meminjamkan Pensil</span>
+          <span class="text-xs text-slate-300 mt-1">Suka berbagi & dermawan</span>
+        </button>
+
+        <button onclick="answerDoor4('C', this)" class="bg-white/10 hover:bg-white/20 border-2 border-white/20 p-4 rounded-2xl text-center transition flex flex-col items-center">
+          <span class="text-3xl mb-1">🙈</span>
+          <span class="font-title text-base font-bold text-white">C. Membiarkannya</span>
+          <span class="text-xs text-slate-300 mt-1">Pura-pura tidak melihat</span>
+        </button>
+      </div>
+
+      <div id="door4-feedback" class="text-center min-h-[24px] text-xs font-bold text-amber-300">
+        Pilihlah perbuatan yang mencerminkan akhlak terpuji!
+      </div>
+    </section>
+
+    <section id="screen-door4-success" class="screen justify-between bg-gradient-to-b from-[#082b20] to-[#0c1833]">
+      <div class="flex justify-between items-center">
+        <span class="text-xs bg-emerald-500 text-emerald-950 font-black px-3 py-1 rounded-full">
+          💚 PILIHAN SUNGGUH MULIA!
+        </span>
+        <span class="text-xs bg-amber-400 text-amber-950 font-black px-3 py-1 rounded-full">
+          🔑 4 KUNCI LENGKAP! (+100 Poin)
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto">
+        <div class="md:col-span-5 text-center">
+          <div class="w-48 h-48 mx-auto rounded-3xl bg-teal-500/20 border-4 border-teal-400 flex flex-col items-center justify-center p-4 glow-gold">
+            <span class="text-6xl mb-1">🎁✨</span>
+            <span class="font-title text-amber-300 font-bold text-lg">AL-KARIM</span>
+            <p class="text-xs text-teal-300 mt-1">Maha Pemurah / Mulia</p>
+          </div>
+        </div>
+        <div class="md:col-span-7 bg-white/10 p-6 rounded-3xl border border-white/15">
+          <h2 class="font-title text-2xl md:text-3xl font-bold text-emerald-300 mb-2">
+            Indahnya Berbagi Kebaikan! 🌟
+          </h2>
+          <div class="bg-black/30 p-4 rounded-2xl border border-teal-500/30 mb-4 text-slate-200 text-sm leading-relaxed">
+            Meminjamkan barang kepada teman membuktikan bahwa kamu meneladani sifat <strong>Al-Karim</strong>. Orang yang dermawan disukai sesama manusia dan dicintai oleh Allah SWT.
+          </div>
+          <button onclick="goToFinalDoorIntro()" class="btn-3d-gold px-8 py-3 rounded-2xl font-bold font-title text-base flex items-center gap-2">
+            <span>BUKA GERBANG EMAS 👑</span>
+            <i class="fa-solid fa-crown"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-between text-xs text-slate-400">
+        <span>Koleksi: 🔑 🔑 🔑 🔑 (Lengkap)</span>
+        <span class="text-amber-400 font-bold">Golden Gate siap dimasuki!</span>
+      </div>
+    </section>
+
+    <section id="screen-bonus" class="screen justify-between bg-gradient-to-b from-[#250d18] to-[#12102b]">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="text-xs bg-rose-500 text-white font-extrabold px-3 py-1 rounded-md">BONUS ROUND</span>
+          <h2 class="text-xl font-title text-amber-300">⚡ RAPID BONUS CHALLENGE</h2>
+        </div>
+        <div class="flex items-center gap-2 bg-rose-950/80 border border-rose-500/50 px-3 py-1 rounded-full">
+          <i class="fa-solid fa-stopwatch text-rose-400"></i>
+          <span id="bonus-timer" class="font-extrabold text-rose-300 text-sm">30s</span>
+        </div>
+      </div>
+
+      <!-- 3 Flashcards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-auto">
+        <div class="bg-white/10 border-2 border-rose-400/40 p-4 rounded-2xl text-center">
+          <div class="text-3xl mb-1">👁️</div>
+          <p class="text-xs text-rose-300 font-bold">SITUASI 1</p>
+          <h4 class="font-title text-lg font-bold text-white my-1">Allah Maha Melihat</h4>
+          <button onclick="answerBonus(1, 'Al-Bashir', this)" class="w-full mt-2 py-2 rounded-xl bg-rose-500/30 hover:bg-rose-500 text-white font-bold text-xs border border-rose-400/50 transition">
+            Al-Bashir
+          </button>
+        </div>
+
+        <div class="bg-white/10 border-2 border-rose-400/40 p-4 rounded-2xl text-center">
+          <div class="text-3xl mb-1">👂</div>
+          <p class="text-xs text-rose-300 font-bold">SITUASI 2</p>
+          <h4 class="font-title text-lg font-bold text-white my-1">Allah Maha Mendengar</h4>
+          <button onclick="answerBonus(2, 'As-Sami\'', this)" class="w-full mt-2 py-2 rounded-xl bg-rose-500/30 hover:bg-rose-500 text-white font-bold text-xs border border-rose-400/50 transition">
+            As-Sami'
+          </button>
+        </div>
+
+        <div class="bg-white/10 border-2 border-rose-400/40 p-4 rounded-2xl text-center">
+          <div class="text-3xl mb-1">🤲</div>
+          <p class="text-xs text-rose-300 font-bold">SITUASI 3</p>
+          <h4 class="font-title text-lg font-bold text-white my-1">Allah Maha Pengampun</h4>
+          <button onclick="answerBonus(3, 'Al-Ghafur', this)" class="w-full mt-2 py-2 rounded-xl bg-rose-500/30 hover:bg-rose-500 text-white font-bold text-xs border border-rose-400/50 transition">
+            Al-Ghafur
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center text-xs">
+        <span class="text-slate-300">+50 Poin Ekstra per jawaban kilat!</span>
+        <button onclick="goToScreen('screen-map')" class="btn-3d-blue px-4 py-2 rounded-xl text-xs font-bold">
+          KEMBALI KE PETA
+        </button>
+      </div>
+    </section>
+
+    <section id="screen-memory" class="screen justify-between bg-gradient-to-b from-[#1b1038] to-[#0c122b]">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="text-xs bg-purple-600 text-white font-extrabold px-3 py-1 rounded-md">MINI GAME</span>
+          <h2 class="text-xl font-title text-amber-300">🧠 MEMORY MAGIC (8 KARTU)</h2>
+        </div>
+        <button onclick="resetMemoryGame()" class="text-xs bg-purple-500/30 hover:bg-purple-500/50 border border-purple-400/50 text-purple-200 px-3 py-1 rounded-lg">
+          <i class="fa-solid fa-arrows-rotate mr-1"></i> Acak Ulang
+        </button>
+      </div>
+
+      <!-- 8 Flip Cards Grid -->
+      <div id="memory-grid" class="grid grid-cols-4 gap-3 my-auto max-w-2xl mx-auto w-full">
+        <!-- Rendered dynamically via JS for real interactive matching -->
+      </div>
+
+      <div class="flex justify-between items-center text-xs text-slate-300">
+        <span id="memory-matched-count">Pasangan Ditemukan: 0 / 4</span>
+        <button onclick="goToScreen('screen-map')" class="btn-3d-blue px-4 py-2 rounded-xl text-xs font-bold">
+          KEMBALI KE PETA 🗺️
+        </button>
+      </div>
+    </section>
+
+    <section id="screen-goldendoor-intro" class="screen justify-between bg-gradient-to-b from-[#2a1b07] to-[#0b1026]">
+      <div class="flex justify-between items-center">
+        <span class="text-xs bg-amber-500 text-amber-950 font-black px-3 py-1 rounded-md">PUNCAK MISI</span>
+        <h2 class="text-2xl font-title text-amber-300">👑 THE GOLDEN DOOR</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto">
+        <div class="md:col-span-5 text-center">
+          <div class="w-52 h-52 mx-auto rounded-3xl bg-gradient-to-b from-amber-400 to-yellow-600 p-2 shadow-2xl glow-gold flex flex-col items-center justify-center">
+            <span class="text-6xl mb-2 floating">👑</span>
+            <span class="font-title text-amber-950 font-black text-xl">GERBANG EMAS</span>
+            <span class="text-xs text-amber-900 font-bold">Semua 4 Kunci Terkumpul!</span>
+          </div>
+        </div>
+
+        <div class="md:col-span-7 bg-white/10 p-6 rounded-3xl border border-amber-400/40">
+          <h3 class="font-title text-2xl md:text-3xl font-bold text-white mb-3">
+            "Empat Kunci Emas Telah Bersatu. Kini Saatnya Membuka Gerbang Terakhir!"
+          </h3>
+          <p class="text-slate-200 text-sm mb-6 leading-relaxed">
+            Di balik gerbang ini tersimpan ujian kuis pamungkas 5 soal untuk menguji pemahaman Asmaul Husna secara menyeluruh.
+          </p>
+          <button onclick="startFinalChallenge()" class="btn-3d-gold px-10 py-3.5 rounded-2xl font-bold font-title text-lg flex items-center gap-2">
+            <span>MASUKI GERBANG EMAS</span>
+            <i class="fa-solid fa-door-open"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-between text-xs text-amber-400">
+        <span>Tantangan Pamungkas: 5 Soal Kuis</span>
+        <span>Gelar: Asmaul Husna Master Explorer 🏅</span>
+      </div>
+    </section>
+
+    <section id="screen-final-quiz" class="screen justify-between bg-gradient-to-b from-[#0c1630] to-[#171233]">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="text-xs bg-amber-500 text-amber-950 font-black px-2.5 py-1 rounded-md">QUIZ SHOW</span>
+          <h2 class="text-xl font-title text-white">🔥 FINAL CHALLENGE</h2>
+        </div>
+        <div id="quiz-progress-badge" class="text-xs bg-amber-400 text-amber-950 font-extrabold px-3 py-1 rounded-full">
+          SOAL 1 DARI 5
+        </div>
+      </div>
+
+      <!-- Question Box -->
+      <div class="bg-white/10 border-2 border-white/20 p-5 rounded-3xl text-center my-2">
+        <p id="quiz-question-num" class="text-xs font-bold text-amber-300 mb-1">PERTANYAAN 1</p>
+        <h3 id="quiz-question-text" class="font-title text-xl md:text-2xl font-bold text-white leading-relaxed">
+          Memuat pertanyaan...
+        </h3>
+      </div>
+
+      <!-- 3 Dynamic Choices -->
+      <div id="quiz-choices-container" class="grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Bottom Progress Bar -->
+      <div class="flex justify-between items-center border-t border-white/10 pt-2 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400">Progres Kuis:</span>
+          <div id="quiz-step-indicators" class="flex gap-1.5">
+            <span class="w-4 h-4 rounded-full bg-slate-600 flex items-center justify-center text-[9px]">1</span>
+            <span class="w-4 h-4 rounded-full bg-slate-600 flex items-center justify-center text-[9px]">2</span>
+            <span class="w-4 h-4 rounded-full bg-slate-600 flex items-center justify-center text-[9px]">3</span>
+            <span class="w-4 h-4 rounded-full bg-slate-600 flex items-center justify-center text-[9px]">4</span>
+            <span class="w-4 h-4 rounded-full bg-slate-600 flex items-center justify-center text-[9px]">5</span>
+          </div>
+        </div>
+        <div id="quiz-feedback" class="font-bold text-amber-300 text-xs">
+          Pilih jawaban yang paling tepat!
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-victory" class="screen justify-between text-center bg-gradient-to-b from-[#1b1904] via-[#211a0a] to-[#090d18]">
+      <div class="flex justify-between items-center">
+        <span class="text-xs bg-amber-400 text-amber-950 font-black px-3 py-1 rounded-full">
+          🏆 MISSION COMPLETE!
+        </span>
+        <span class="text-xs bg-emerald-500 text-emerald-950 font-black px-3 py-1 rounded-full">
+          PINTU EMAS DIBUKA SEMPURNA
+        </span>
+      </div>
+
+      <div class="my-auto">
+        <div class="text-6xl mb-2 floating">👑🏆✨</div>
+        <h1 class="font-title text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-400 mb-2">
+          SELAMAT, ASMAUL HUSNA EXPLORER!
+        </h1>
+        <p class="text-slate-200 text-sm md:text-base max-w-lg mx-auto mb-6">
+          Kamu telah menaklukkan seluruh pintu istana, menguasai 10 Asmaul Husna, dan berhasil menjadi pemenang sejati!
+        </p>
+
+        <!-- Score Badge Board -->
+        <div class="inline-flex flex-wrap gap-4 items-center bg-white/10 border-2 border-amber-400/70 p-4 rounded-3xl shadow-2xl mb-4">
+          <div class="text-left px-2">
+            <p class="text-[10px] text-amber-300 font-extrabold uppercase">Total Kunci</p>
+            <p class="font-title text-2xl font-bold text-white">🔑 4 KUNCI</p>
+          </div>
+          <div class="w-[1px] h-10 bg-white/20 hidden sm:block"></div>
+          <div class="text-left px-2">
+            <p class="text-[10px] text-amber-300 font-extrabold uppercase">Skor Bintang</p>
+            <p id="victory-score-display" class="font-title text-2xl font-bold text-yellow-300">500 ⭐</p>
+          </div>
+          <div class="w-[1px] h-10 bg-white/20 hidden sm:block"></div>
+          <div class="text-left px-2">
+            <p class="text-[10px] text-amber-300 font-extrabold uppercase">Gelar Kehormatan</p>
+            <p class="font-title text-xl font-bold text-emerald-300">🏅 Master Explorer</p>
+          </div>
+        </div>
+
+        <div class="mt-2">
+          <button onclick="goToScreen('screen-reflection')" class="btn-3d-gold px-8 py-3.5 rounded-2xl font-bold font-title text-base inline-flex items-center gap-2">
+            <span>REFLEKSI DIRI ➜</span>
+            <i class="fa-solid fa-heart"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="text-xs text-amber-400">
+        Tekan Refleksi Diri untuk mengamalkan nama-nama Allah dalam kehidupan sehari-hari!
+      </div>
+    </section>
+
+    <section id="screen-reflection" class="screen justify-between bg-gradient-to-b from-[#091b1a] to-[#0d162d]">
+      <div class="flex justify-between items-center">
+        <span class="text-xs bg-emerald-500 text-emerald-950 font-black px-3 py-1 rounded-md">PENGAMALAN NILAI</span>
+        <h2 class="text-2xl font-title text-amber-300">💭 REFLECTION TIME</h2>
+      </div>
+
+      <p class="text-center text-sm md:text-base text-slate-200">
+        "Setelah mengenal nama-nama Allah SWT, sikap baik apa yang ingin kamu lakukan mulai hari ini?"
+      </p>
+
+      <!-- 3 Reflection Badges (Clickable) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
+        <div onclick="selectReflection('Lebih Penyayang (Ar-Rahim)')" class="reflection-card bg-white/10 hover:bg-white/20 border-2 border-emerald-400/40 p-4 rounded-2xl text-center cursor-pointer transition">
+          <span class="text-3xl mb-1 block">❤️</span>
+          <h4 class="font-title text-base font-bold text-emerald-300">Lebih Penyayang</h4>
+          <p class="text-xs text-slate-300 mt-1">Menyayangi keluarga, guru, dan teman.</p>
+        </div>
+
+        <div onclick="selectReflection('Suka Berbagi (Al-Karim)')" class="reflection-card bg-white/10 hover:bg-white/20 border-2 border-emerald-400/40 p-4 rounded-2xl text-center cursor-pointer transition">
+          <span class="text-3xl mb-1 block">🤝</span>
+          <h4 class="font-title text-base font-bold text-amber-300">Suka Berbagi</h4>
+          <p class="text-xs text-slate-300 mt-1">Gemar bersedekah & menolong yang kesusahan.</p>
+        </div>
+
+        <div onclick="selectReflection('Mudah Memaafkan (Al-Ghafur)')" class="reflection-card bg-white/10 hover:bg-white/20 border-2 border-emerald-400/40 p-4 rounded-2xl text-center cursor-pointer transition">
+          <span class="text-3xl mb-1 block">😊</span>
+          <h4 class="font-title text-base font-bold text-sky-300">Mudah Memaafkan</h4>
+          <p class="text-xs text-slate-300 mt-1">Tidak menyimpan dendam saat teman salah.</p>
+        </div>
+      </div>
+
+      <!-- Editable Deed Pledge -->
+      <div class="bg-white/10 border-2 border-dashed border-emerald-400/50 p-3 rounded-2xl flex flex-col sm:flex-row items-center gap-3">
+        <span class="text-xs font-extrabold text-emerald-300 whitespace-nowrap">✍️ JANJI KEBAIKANKU:</span>
+        <input id="pledge-input" type="text" value="Saya akan tersenyum, jujur, dan suka berbagi kepada teman." class="w-full bg-black/40 text-white text-xs px-3 py-2 rounded-xl border border-white/20 focus:outline-none focus:border-amber-400">
+        <button onclick="savePledge()" class="btn-3d-emerald px-4 py-2 rounded-xl text-xs font-bold font-title whitespace-nowrap">
+          SIMPAN JANJI
+        </button>
+      </div>
+
+      <div class="flex justify-between items-center text-xs text-slate-400">
+        <span id="pledge-status">Pilih kartu refleksi atau ketik janjimu!</span>
+        <button onclick="goToScreen('screen-closing')" class="btn-3d-blue px-6 py-2 rounded-xl text-xs font-bold font-title">
+          SELESAI ➔
+        </button>
+      </div>
+    </section>
+
+    <section id="screen-closing" class="screen justify-between text-center bg-gradient-to-b from-[#080d1e] via-[#101738] to-[#040711]">
+      <div class="flex justify-between items-center">
+        <span class="text-xs bg-amber-400/20 text-amber-300 border border-amber-400/40 px-3 py-1 rounded-full font-bold">
+          🌟 PETUALANGAN PURNA
+        </span>
+        <span class="text-xs text-slate-400">Pendidikan Agama Islam SD</span>
+      </div>
+
+      <div class="my-auto">
+        <div class="text-5xl mb-2 floating">🌟🌙✨</div>
+        <h1 class="font-title text-3xl md:text-5xl font-black text-white mb-2">
+          SEE YOU, ASMAUL HUSNA EXPLORER!
+        </h1>
+        <p class="text-slate-300 text-sm md:text-base max-w-lg mx-auto mb-4">
+          Teruslah belajar, berbuat kebaikan, dan mengamalkan nilai-nilai luhur Asmaul Husna dalam keseharian.
+        </p>
+
+        <div class="inline-block bg-amber-500/10 border border-amber-400/30 px-6 py-2 rounded-full mb-6">
+          <p class="text-amber-300 font-extrabold text-xs md:text-sm">
+            "Because every good deed starts with a good heart. ❤️"
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-center gap-4">
+          <button onclick="restartGame()" class="btn-3d-gold px-8 py-3.5 rounded-2xl font-bold font-title text-sm flex items-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>MAIN LAGI 🔄</span>
+          </button>
+          <button onclick="goToScreen('screen-cover')" class="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold font-title text-sm flex items-center gap-2 transition">
+            <i class="fa-solid fa-house"></i>
+            <span>BERANDA 🏠</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="text-xs text-slate-500 border-t border-white/10 pt-2">
+        Media Pembelajaran Digital Interaktif • Kurikulum PAI SD Kelas 3–6
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let isSoundMuted = false;
+
+    function playTone(freq, type, duration, delay = 0) {
+      if (isSoundMuted) return;
+      setTimeout(() => {
+        try {
+          if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {
+          console.warn('Audio tone error', e);
+        }
+      }, delay * 1000);
+    }
+
+    // Sound FX Presets
+    function soundClick() {
+      playTone(520, 'sine', 0.1);
+    }
+    function soundCorrect() {
+      playTone(523.25, 'triangle', 0.15, 0);   // C5
+      playTone(659.25, 'triangle', 0.2, 0.12); // E5
+      playTone(783.99, 'triangle', 0.35, 0.24);// G5
+      playTone(1046.50, 'triangle', 0.45, 0.36);// C6
+    }
+    function soundWrong() {
+      playTone(220, 'sawtooth', 0.2, 0);
+      playTone(180, 'sawtooth', 0.3, 0.15);
+    }
+    function soundFanfare() {
+      [523, 659, 783, 1046, 1318].forEach((f, i) => {
+        playTone(f, 'sine', 0.4, i * 0.1);
+      });
+    }
+
+    function toggleAudio() {
+      isSoundMuted = !isSoundMuted;
+      const btn = document.getElementById('btn-sound');
+      if (isSoundMuted) {
+        btn.innerHTML = '<i class="fa-solid fa-volume-xmark text-rose-400"></i>';
+      } else {
+        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+        soundClick();
+      }
+    }
+
+    const gameState = {
+      score: 0,
+      keys: [false, false, false, false], // Key 1, 2, 3, 4
+      doorsUnlocked: [true, false, false, false, false], // Door 1, 2, 3, 4, Final Gate
+      bonusTimer: null,
+      bonusSecondsLeft: 30
+    };
+
+    function updateHud() {
+      document.getElementById('hud-score').innerText = gameState.score;
+      for (let i = 1; i <= 4; i++) {
+        const keyEl = document.getElementById(`hud-key-${i}`);
+        if (gameState.keys[i - 1]) {
+          keyEl.className = 'text-base text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)] scale-110';
+        } else {
+          keyEl.className = 'text-base text-gray-500';
+        }
+      }
+    }
+
+    function addScore(amount) {
+      gameState.score += amount;
+      updateHud();
+    }
+
+    function unlockKey(keyNumber) {
+      gameState.keys[keyNumber - 1] = true;
+      if (keyNumber < 4) {
+        gameState.doorsUnlocked[keyNumber] = true; // Unlock next door
+      } else {
+        gameState.doorsUnlocked[4] = true; // Unlock Final Golden Gate
+      }
+      updateHud();
+      updateMapUI();
+      triggerConfetti();
+    }
+
+    function goToScreen(screenId) {
+      soundClick();
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(screenId);
+      if (target) {
+        target.classList.add('active');
+      }
+    }
+
+    function startGame() {
+      soundCorrect();
+      goToScreen('screen-intro');
+    }
+
+    function updateMapUI() {
+      // Door 2
+      const d2Status = document.getElementById('status-door-2');
+      const d2Node = document.getElementById('node-door-2');
+      if (gameState.doorsUnlocked[1]) {
+        d2Status.innerText = 'TERBUKA 🔓';
+        d2Status.className = 'mt-2 text-[11px] font-extrabold text-emerald-400';
+        d2Node.classList.add('border-purple-400');
+      }
+
+      // Door 3
+      const d3Status = document.getElementById('status-door-3');
+      const d3Node = document.getElementById('node-door-3');
+      if (gameState.doorsUnlocked[2]) {
+        d3Status.innerText = 'TERBUKA 🔓';
+        d3Status.className = 'mt-2 text-[11px] font-extrabold text-emerald-400';
+        d3Node.classList.add('border-orange-400');
+      }
+
+      // Door 4
+      const d4Status = document.getElementById('status-door-4');
+      const d4Node = document.getElementById('node-door-4');
+      if (gameState.doorsUnlocked[3]) {
+        d4Status.innerText = 'TERBUKA 🔓';
+        d4Status.className = 'mt-2 text-[11px] font-extrabold text-emerald-400';
+        d4Node.classList.add('border-teal-400');
+      }
+
+      // Final Gate
+      const d5Status = document.getElementById('status-door-5');
+      if (gameState.doorsUnlocked[4]) {
+        d5Status.innerText = 'SIAP DIBUKA 🔓';
+        d5Status.className = 'mt-2 text-[11px] font-black text-amber-200 animate-pulse';
+      }
+    }
+
+    function selectMapDoor(doorNum) {
+      if (!gameState.doorsUnlocked[doorNum - 1]) {
+        soundWrong();
+        alert('Selesaikan pintu sebelumnya terlebih dahulu untuk membuka gembok ini! 🔒');
+        return;
+      }
+      switch (doorNum) {
+        case 1: goToScreen('screen-door1-intro'); break;
+        case 2: goToScreen('screen-door2'); break;
+        case 3: goToScreen('screen-door3'); break;
+        case 4: goToScreen('screen-door4'); break;
+        case 5:
+          if (gameState.keys.every(k => k === true)) {
+            goToScreen('screen-goldendoor-intro');
+          } else {
+            soundWrong();
+            alert('Kamu membutuhkan 4 Kunci Emas lengkap untuk membuka Golden Gate! 🔑');
+          }
+          break;
+      }
+    }
+
+    function answerDoor1(choice, btn) {
+      const feedback = document.getElementById('door1-feedback');
+      if (choice === 'B') {
+        // Correct (Ar-Rahman)
+        soundCorrect();
+        btn.classList.add('border-emerald-400', 'bg-emerald-500/30');
+        feedback.innerHTML = '<span class="text-emerald-400">✨ BENAR! Ar-Rahman berarti Maha Pengasih.</span>';
+        if (!gameState.keys[0]) {
+          addScore(100);
+          unlockKey(1);
+        }
+        setTimeout(() => {
+          goToScreen('screen-door1-success');
+        }, 800);
+      } else {
+        soundWrong();
+        btn.classList.add('border-rose-400', 'bg-rose-500/20');
+        feedback.innerHTML = '<span class="text-rose-400">Kurang tepat. Coba lagi petunjuk kasih sayang!</span>';
+        setTimeout(() => {
+          btn.classList.remove('border-rose-400', 'bg-rose-500/20');
+        }, 1000);
+      }
+    }
+
+    function goToDoor2() {
+      goToScreen('screen-door2');
+    }
+
+    let selectedMatchNameIndex = null;
+    let matchedCount = 0;
+
+    function selectMatchName(index, el) {
+      soundClick();
+      document.querySelectorAll('.match-name-btn').forEach(b => b.classList.remove('border-amber-400', 'bg-purple-600/40'));
+      el.classList.add('border-amber-400', 'bg-purple-600/40');
+      selectedMatchNameIndex = index;
+    }
+
+    function selectMatchMeaning(pairIndex, el) {
+      if (selectedMatchNameIndex === null) {
+        soundWrong();
+        document.getElementById('match-status-text').innerText = 'Pilih salah satu nama Asmaul Husna di sebelah kiri terlebih dahulu!';
+        return;
+      }
+
+      if (selectedMatchNameIndex === pairIndex) {
+        // Correct pair
+        soundCorrect();
+        el.classList.add('border-emerald-400', 'bg-emerald-600/40', 'pointer-events-none');
+        const nameBtn = document.querySelector(`.match-name-btn[data-index="${selectedMatchNameIndex}"]`);
+        if (nameBtn) {
+          nameBtn.classList.add('border-emerald-400', 'bg-emerald-600/40', 'pointer-events-none');
+        }
+        selectedMatchNameIndex = null;
+        matchedCount++;
+        document.getElementById('match-status-text').innerText = `Hebat! Tersisa ${4 - matchedCount} pasangan.`;
+
+        if (matchedCount === 4) {
+          if (!gameState.keys[1]) {
+            addScore(100);
+            unlockKey(2);
+          }
+          setTimeout(() => {
+            goToScreen('screen-door2-success');
+          }, 800);
+        }
+      } else {
+        soundWrong();
+        el.classList.add('border-rose-400', 'bg-rose-600/30');
+        document.getElementById('match-status-text').innerText = 'Pasangan belum cocok, coba lagi!';
+        setTimeout(() => {
+          el.classList.remove('border-rose-400', 'bg-rose-600/30');
+        }, 800);
+      }
+    }
+
+    function goToDoor3() {
+      goToScreen('screen-door3');
+    }
+
+    function answerDoor3(choice, btn) {
+      const feedback = document.getElementById('door3-feedback');
+      if (choice === 'A') {
+        soundCorrect();
+        btn.classList.add('border-emerald-400', 'bg-emerald-500/30');
+        feedback.innerHTML = '<span class="text-emerald-400">🕵️ TEPAT! Al-\'Alim berarti Allah Maha Mengetahui.</span>';
+        if (!gameState.keys[2]) {
+          addScore(100);
+          unlockKey(3);
+        }
+        setTimeout(() => {
+          goToScreen('screen-door3-success');
+        }, 800);
+      } else {
+        soundWrong();
+        btn.classList.add('border-rose-400', 'bg-rose-500/20');
+        feedback.innerHTML = '<span class="text-rose-400">Bukan nama itu. Ingat sifat yang mengetahui semua hal!</span>';
+        setTimeout(() => {
+          btn.classList.remove('border-rose-400', 'bg-rose-500/20');
+        }, 1000);
+      }
+    }
+
+    function goToDoor4() {
+      goToScreen('screen-door4');
+    }
+
+    function answerDoor4(choice, btn) {
+      const feedback = document.getElementById('door4-feedback');
+      if (choice === 'B') {
+        soundCorrect();
+        btn.classList.add('border-emerald-400', 'bg-emerald-500/30');
+        feedback.innerHTML = '<span class="text-emerald-400">💚 SUNGGUH MULIA! Meneladani sifat Al-Karim (Maha Pemurah).</span>';
+        if (!gameState.keys[3]) {
+          addScore(100);
+          unlockKey(4);
+        }
+        setTimeout(() => {
+          goToScreen('screen-door4-success');
+        }, 800);
+      } else {
+        soundWrong();
+        btn.classList.add('border-rose-400', 'bg-rose-500/20');
+        feedback.innerHTML = '<span class="text-rose-400">Tindakan itu belum mencerminkan kasih dan kemurahan hati.</span>';
+        setTimeout(() => {
+          btn.classList.remove('border-rose-400', 'bg-rose-500/20');
+        }, 1000);
+      }
+    }
+
+    function goToFinalDoorIntro() {
+      goToScreen('screen-goldendoor-intro');
+    }
+
+    function answerBonus(num, expected, btn) {
+      soundCorrect();
+      btn.innerText = '✅ ' + expected;
+      btn.classList.remove('bg-rose-500/30');
+      btn.classList.add('bg-emerald-500', 'pointer-events-none');
+      addScore(50);
+    }
+
+    const memoryItems = [
+      { id: 1, text: "Ar-Rahman", matchId: 1 },
+      { id: 1, text: "Maha Pengasih", matchId: 1 },
+      { id: 2, text: "Ar-Rahim", matchId: 2 },
+      { id: 2, text: "Maha Penyayang", matchId: 2 },
+      { id: 3, text: "Al-'Alim", matchId: 3 },
+      { id: 3, text: "Maha Mengetahui", matchId: 3 },
+      { id: 4, text: "As-Sami'", matchId: 4 },
+      { id: 4, text: "Maha Mendengar", matchId: 4 }
+    ];
+
+    let flippedCards = [];
+    let memoryMatchedPairs = 0;
+
+    function resetMemoryGame() {
+      const grid = document.getElementById('memory-grid');
+      grid.innerHTML = '';
+      flippedCards = [];
+      memoryMatchedPairs = 0;
+      document.getElementById('memory-matched-count').innerText = 'Pasangan Ditemukan: 0 / 4';
+
+      const shuffled = [...memoryItems].sort(() => Math.random() - 0.5);
+      shuffled.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'memory-card h-20 w-full';
+        card.dataset.matchId = item.matchId;
+        card.innerHTML = `
+          <div class="memory-card-inner">
+            <div class="memory-card-front bg-purple-900/60 border-2 border-purple-400/50 text-2xl text-amber-300">
+              ❓
+            </div>
+            <div class="memory-card-back bg-gradient-to-br from-amber-400 to-yellow-500 text-amber-950 font-title font-bold text-xs p-1 shadow-md">
+              ${item.text}
+            </div>
+          </div>
+        `;
+        card.onclick = () => handleMemoryCardClick(card);
+        grid.appendChild(card);
+      });
+    }
+
+    function handleMemoryCardClick(card) {
+      if (card.classList.contains('flipped') || flippedCards.length >= 2) return;
+
+      soundClick();
+      card.classList.add('flipped');
+      flippedCards.push(card);
+
+      if (flippedCards.length === 2) {
+        const [c1, c2] = flippedCards;
+        if (c1.dataset.matchId === c2.dataset.matchId) {
+          // Matched
+          soundCorrect();
+          memoryMatchedPairs++;
+          document.getElementById('memory-matched-count').innerText = `Pasangan Ditemukan: ${memoryMatchedPairs} / 4`;
+          flippedCards = [];
+          if (memoryMatchedPairs === 4) {
+            soundFanfare();
+            addScore(100);
+            triggerConfetti();
+          }
+        } else {
+          // Not matched
+          soundWrong();
+          setTimeout(() => {
+            c1.classList.remove('flipped');
+            c2.classList.remove('flipped');
+            flippedCards = [];
+          }, 800);
+        }
+      }
+    }
+
+    const finalQuestions = [
+      {
+        q: "Ar-Rahman artinya Allah Yang Maha...",
+        options: ["Maha Mengetahui", "Maha Pengasih", "Maha Melihat"],
+        correct: 1
+      },
+      {
+        q: "Nama Allah SWT yang berarti Maha Mendengar adalah...",
+        options: ["As-Sami'", "Al-Bashir", "Al-'Adl"],
+        correct: 0
+      },
+      {
+        q: "Saat memohon ampunan dosa kepada Allah, kita berseru kepada...",
+        options: ["Al-Ghafur", "Ar-Razzaq", "Al-Karim"],
+        correct: 0
+      },
+      {
+        q: "Allah Maha Melihat seluruh makhluk tanpa ada yang tersembunyi, yaitu...",
+        options: ["Al-'Alim", "Al-Bashir", "At-Tawwab"],
+        correct: 1
+      },
+      {
+        q: "Allah yang memberikan rezeki dan kecukupan hidup kepada semua makhluk adalah...",
+        options: ["Ar-Razzaq", "Al-'Adl", "As-Sami'"],
+        correct: 0
+      }
+    ];
+
+    let currentQuizIndex = 0;
+
+    function startFinalChallenge() {
+      currentQuizIndex = 0;
+      goToScreen('screen-final-quiz');
+      renderCurrentQuizQuestion();
+    }
+
+    function renderCurrentQuizQuestion() {
+      const q = finalQuestions[currentQuizIndex];
+      document.getElementById('quiz-progress-badge').innerText = `SOAL ${currentQuizIndex + 1} DARI 5`;
+      document.getElementById('quiz-question-num').innerText = `PERTANYAAN ${currentQuizIndex + 1}`;
+      document.getElementById('quiz-question-text').innerText = `"${q.q}"`;
+
+      const container = document.getElementById('quiz-choices-container');
+      container.innerHTML = '';
+      const letters = ['A', 'B', 'C'];
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'bg-white/10 hover:bg-white/20 border-2 border-white/20 p-4 rounded-2xl text-center transition flex flex-col items-center';
+        btn.innerHTML = `
+          <span class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center text-sm mb-1">${letters[idx]}</span>
+          <span class="font-title text-lg font-bold text-white">${opt}</span>
+        `;
+        btn.onclick = () => handleFinalQuizAnswer(idx, btn);
+        container.appendChild(btn);
+      });
+
+      // Update Step Indicators
+      const stepDots = document.getElementById('quiz-step-indicators').children;
+      for (let i = 0; i < 5; i++) {
+        if (i < currentQuizIndex) {
+          stepDots[i].className = 'w-4 h-4 rounded-full bg-emerald-500 text-black flex items-center justify-center text-[9px] font-bold';
+        } else if (i === currentQuizIndex) {
+          stepDots[i].className = 'w-4 h-4 rounded-full bg-amber-400 text-black flex items-center justify-center text-[9px] font-bold';
+        } else {
+          stepDots[i].className = 'w-4 h-4 rounded-full bg-slate-600 flex items-center justify-center text-[9px]';
+        }
+      }
+    }
+
+    function handleFinalQuizAnswer(selectedIndex, btn) {
+      const q = finalQuestions[currentQuizIndex];
+      const feedback = document.getElementById('quiz-feedback');
+
+      if (selectedIndex === q.correct) {
+        soundCorrect();
+        btn.classList.add('border-emerald-400', 'bg-emerald-500/30');
+        feedback.innerHTML = '<span class="text-emerald-400">✨ Tepat sekali! +20 Poin</span>';
+        addScore(20);
+
+        setTimeout(() => {
+          currentQuizIndex++;
+          if (currentQuizIndex < finalQuestions.length) {
+            renderCurrentQuizQuestion();
+          } else {
+            // Victory!
+            soundFanfare();
+            triggerConfetti();
+            document.getElementById('victory-score-display').innerText = `${gameState.score} ⭐`;
+            goToScreen('screen-victory');
+          }
+        }, 700);
+      } else {
+        soundWrong();
+        btn.classList.add('border-rose-400', 'bg-rose-500/20');
+        feedback.innerHTML = '<span class="text-rose-400">Belum tepat, pilih jawaban yang paling sesuai!</span>';
+        setTimeout(() => {
+          btn.classList.remove('border-rose-400', 'bg-rose-500/20');
+        }, 800);
+      }
+    }
+
+    function selectReflection(text) {
+      soundClick();
+      const input = document.getElementById('pledge-input');
+      input.value = `Saya bertekad untuk ${text.toLowerCase()} dalam pergaulan sehari-hari.`;
+      document.getElementById('pledge-status').innerText = 'Pilihan refleksi diterapkan ke kotak janji!';
+    }
+
+    function savePledge() {
+      soundCorrect();
+      document.getElementById('pledge-status').innerHTML = '<span class="text-emerald-300 font-bold">✅ Janji kebaikan berhasil disimpan di hatimu!</span>';
+    }
+
+    function restartGame() {
+      soundClick();
+      gameState.score = 0;
+      gameState.keys = [false, false, false, false];
+      gameState.doorsUnlocked = [true, false, false, false, false];
+      updateHud();
+      updateMapUI();
+      resetMemoryGame();
+      goToScreen('screen-cover');
+    }
+
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function triggerConfetti() {
+      const colors = ['#F59E0B', '#10B981', '#38BDF8', '#EC4899', '#A855F7', '#FBBF24'];
+      for (let i = 0; i < 70; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 3,
+          vx: (Math.random() - 0.5) * 14,
+          vy: (Math.random() - 0.5) * 14 - 3,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          vRot: (Math.random() - 0.5) * 10,
+          life: 100
+        });
+      }
+    }
+
+    function updateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p, idx) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.25; // gravity
+        p.rotation += p.vRot;
+        p.life -= 1.2;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rotation * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
+        ctx.restore();
+
+        if (p.life <= 0 || p.y > canvas.height) {
+          particles.splice(idx, 1);
+        }
+      });
+      requestAnimationFrame(updateConfetti);
+    }
+    requestAnimationFrame(updateConfetti);
+
+    // Initial setup on load
+    window.onload = function() {
+      updateHud();
+      updateMapUI();
+      resetMemoryGame();
+    };
+  </script>
+</body>
+</html>
